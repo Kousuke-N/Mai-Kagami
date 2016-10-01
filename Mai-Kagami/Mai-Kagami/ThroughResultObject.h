@@ -69,6 +69,7 @@ public:
 	~ResultGraph();
 private:
 	void ContentView();
+	void AddVertex(float x, float y);
 	MyDrawBox *myDrawBox;
 	MyDrawTexts *scale; //ñ⁄ê∑ÇË
 	MyDrawCircle *dot[10]; //ì_
@@ -79,6 +80,9 @@ private:
 	const float w = WIDTH * 0.6, h = HEIGHT * 0.13;
 	int pointMax = 0, partMax = 0;
 	MyDrawPolygon *graph;
+	float vertex_x[100] = { 0 };
+	float vertex_y[100] = { 0 };
+	int vertexNum;
 };
 
 #endif

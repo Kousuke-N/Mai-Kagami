@@ -74,16 +74,18 @@ private:
 };
 
 //‘½ŠpŒ`
-class MyDrawPolygon : public Draw, public Color {
+class MyDrawPolygon : public Draw {
 public:
 	MyDrawPolygon(const float x[], const float y[], int vertexNum, char *colorName = "Blue");
 	void ContentView();
+	void Delete();
 private:
 	void ClassifyArray(const float x[], const float y[], int triangleVertex, int vertexNum, float tri_x[], float tri_y[], float ntri_x[], float ntri_y[]);
 	int FindFarthestVertex(const float x[], const float y[], int vertexNum);
 	bool CheckNoPointInGraph(const float ntri_x[], const float ntri_y[], const float tri_x[], const float tri_y[], int vertexNum);
 	int CheckGraphDirction(const float tri_x[], const float tri_y[]);
 	MyDrawTriangle* triangle[100];	//‘½ŠpŒ`‚ğ–„‚ß‚éOŠpŒ`
+	MyDrawLine* line[300];
 	int triangleNum = 0;	//OŠpŒ`‚Ì”
 };
 

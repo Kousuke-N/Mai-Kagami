@@ -190,7 +190,7 @@ float MyDrawBox::GetHeight() {
 
 //MyPolygon(頂点のx座標,頂点のy座標,頂点の数,色)
 MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, char* colorName) 
-	:Color(colorName), Draw(){
+	:Draw(){
 	float xx[100] = { 0 }, yy[100] = { 0 };
 	//x[]をコピー
 	for (int i = 0; i < vertexNum; i++) {
@@ -200,7 +200,8 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 	//三角形の座標､非三角形の座標
 	float tri_x[3], tri_y[3], ntri_x[97], ntri_y[97];
 	int j = 0;
-	//while (vertexNum > 0) {
+
+	while (vertexNum > 0) {
 		int i = 0;
 		//図形の方向を記録する変数
 		int oldDirection = 0, newDirection = 0;
@@ -209,7 +210,6 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 		do {
 			//三角形を構成する頂点とそれ以外の頂点を分類
 			ClassifyArray(xx, yy,  farthestVertex++, vertexNum, tri_x, tri_y, ntri_x, ntri_y);
-
 			//三角形の向きを記録しそれを比較
 			oldDirection = newDirection;
 			newDirection = CheckGraphDirction(tri_x, tri_y);
@@ -218,13 +218,18 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 			}
 		} while (!CheckNoPointInGraph(ntri_x, ntri_y, tri_x, tri_y, vertexNum - 3));
 
-		triangle[j] = new MyDrawTriangle(tri_x[0], tri_y[0], tri_x[1], tri_y[1], tri_x[2], tri_y[2]);
+		triangle[j] = new MyDrawTriangle(tri_x[0], tri_y[0], tri_x[1], tri_y[1], tri_x[2], tri_y[2], colorName);
+		line[3 * j + 0] = new MyDrawLine(tri_x[0], tri_y[0], tri_x[1], tri_y[1], 6, "Blue");
+		line[3 * j + 1] = new MyDrawLine(tri_x[1], tri_y[1], tri_x[2], tri_y[2], 6, "Blue");
+		line[3 * j + 2] = new MyDrawLine(tri_x[2], tri_y[2], tri_x[0], tri_y[0], 6, "Blue");
 		triangleNum++;	j++;
 		//三角形の頂点を除く配列の作成
-		printfDx("%d", xx);
-		//while (++(xx + farthestVertex) < 0)
-		//	*(ptr - 1) = *ptr;
-	//}
+		for (int i = 0; farthestVertex - 2 + i < vertexNum; i++) {
+			*(xx + farthestVertex - 2 + i) = *(xx + farthestVertex - 1 + i);
+			*(yy + farthestVertex - 2 + i) = *(yy + farthestVertex - 1 + i);
+		}
+		vertexNum--;
+	}
 }
 
 //座標を三角形を構成する点とそうでない点に分類する
@@ -242,7 +247,6 @@ void MyDrawPolygon::ClassifyArray(const float x[], const float y[], int triangle
 		if (i == vertexMakingTriangle[0] || i == vertexMakingTriangle[1] || i == vertexMakingTriangle[2]) {
 			tri_x[i - n] = x[i];
 			tri_y[i - n] = y[i];
-			printfDx("%f %f\n", x[i], y[i]);
 			continue;
 		}
 		ntri_x[n] = x[i];	ntri_y[n] = y[i];
@@ -294,6 +298,18 @@ int MyDrawPolygon::CheckGraphDirction(const float tri_x[], const float tri_y[]) 
 void MyDrawPolygon::ContentView() {
 	for (int i = 0; i < triangleNum; i++) {
 		triangle[i]->View();
+		line[3 * i + 0]->View();
+		line[3 * i + 1]->View();
+		line[3 * i + 2]->View();
+	}
+}
+
+void MyDrawPolygon::Delete() {
+	for (int i = 0; i < triangleNum; i++) {
+		delete triangle[i];
+		delete line[3 * i + 0];
+		delete line[3 * i + 1];
+		delete line[3 * i + 2];
 	}
 }
 

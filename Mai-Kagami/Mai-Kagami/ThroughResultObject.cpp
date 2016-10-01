@@ -126,17 +126,28 @@ ResultBody::~ResultBody() {
 ResultGraph::ResultGraph(Font *font) 
 	: Draw(WIDTH * 0.65, HEIGHT * 0.31) {
 	this->font = font;
+	this->vertexNum = 0;
 	frame[0] = new MyDrawLine(GetX() - w / 2, GetY() - h / 2, GetX() - w / 2, GetY() + h / 2, 6, "White");
 	frame[1] = new MyDrawLine(GetX() - w / 2, GetY() + h / 2, GetX() + w / 2, GetY() + h / 2, 6, "White");
 	scale = new MyDrawTexts(font, "100\n・\n・\n・\n・\n50\n・\n・\n・\n・\n0", GetX() - w / 2 - WIDTH * 0.025, GetY(), 1, 20, 4);
+	AddVertex(GetX() + w / 2, GetY() + h / 2);
+	AddVertex(GetX() - w / 2, GetY() + h / 2);
+}
+
+void ResultGraph::AddVertex(float x, float y) {
+	vertex_x[vertexNum] = x;
+	vertex_y[vertexNum] = y;
+	vertexNum++;
 }
 
 void ResultGraph::Load(const int *point, const int num, Song *song) {
 	pointMax = num;
 	partMax = song->GetPartNum();
+	
 	for (int i = 0; i < num; i++) {
 		float x1 = GetX() - w / 2 + (float)i / (num - 1) * w;
 		float y1 = GetY() + h / 2 - (float)point[i] / 100 * h;
+		AddVertex(x1, y1);
 		if (i > 0) {
 			float x2 = GetX() - w / 2 + (float)(i - 1) / (num - 1) * w;
 			float y2 = GetY() + h / 2 - (float)point[i - 1] / 100 * h;
@@ -154,12 +165,11 @@ void ResultGraph::Load(const int *point, const int num, Song *song) {
 		float x = GetX() - w / 2 + w * (float)songPart->GetFlame() / song->danceMovie->GetEndFlame();
 		part[i] = new MyDrawTextV(font, songPart->GetName(),  x, GetY() + HEIGHT * 0.075, 2, 16);
 	}
-	float testx[] = { WIDTH*0.1,WIDTH * 0.1,WIDTH*0.2,WIDTH*0.3,WIDTH*0.3 };
-	float testy[] = { HEIGHT*0.1,HEIGHT*0.3,HEIGHT*0.2,HEIGHT*0.3,HEIGHT*0.1 };
-	graph = new MyDrawPolygon(testx, testy, 5);
+	graph = new MyDrawPolygon(vertex_x, vertex_y, vertexNum, "Blue");
 }
 
 void ResultGraph::ContentView() {
+	graph->View();
 	for (int i = 0; i < partMax; i++)
 		part[i]->View();
 	for (int i = 0; i < pointMax - 1; i++)
@@ -170,7 +180,6 @@ void ResultGraph::ContentView() {
 	for (int i = 0; i < 2; i++)
 		frame[i]->View();
 	scale->View();
-	graph->View();
 }
 
 void ResultGraph::Delete() {
@@ -181,6 +190,7 @@ void ResultGraph::Delete() {
 	}
 	for (int i = 0; i < partMax; i++)
 		delete part[i];
+	graph->Delete();
 }
 
 ResultGraph::~ResultGraph() {
