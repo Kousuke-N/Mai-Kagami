@@ -70,10 +70,11 @@ public:
 private:
 	void ContentView();
 	void AddVertex(float x, float y);
+	MyDrawText *text;
 	MyDrawBox *myDrawBox;
 	MyDrawTexts *scale; //ñ⁄ê∑ÇË
-	MyDrawCircle *dot[10]; //ì_
-	MyDrawLine *line[9]; //ì_
+	MyDrawGraph *dot[10];	//ì_
+	MyDrawLine *line[9]; //ê¸
 	MyDrawLine *frame[2]; //ògê¸
 	MyDrawTextV *part[64];
 	Font *font;
