@@ -154,6 +154,9 @@ void ResultGraph::Load(const int *point, const int num, Song *song) {
 		float x = GetX() - w / 2 + w * (float)songPart->GetFlame() / song->danceMovie->GetEndFlame();
 		part[i] = new MyDrawTextV(font, songPart->GetName(),  x, GetY() + HEIGHT * 0.075, 2, 16);
 	}
+	float testx[] = { WIDTH*0.1,WIDTH * 0.1,WIDTH*0.2,WIDTH*0.3,WIDTH*0.3 };
+	float testy[] = { HEIGHT*0.1,HEIGHT*0.3,HEIGHT*0.2,HEIGHT*0.3,HEIGHT*0.1 };
+	graph = new MyDrawPolygon(testx, testy, 5);
 }
 
 void ResultGraph::ContentView() {
@@ -167,6 +170,7 @@ void ResultGraph::ContentView() {
 	for (int i = 0; i < 2; i++)
 		frame[i]->View();
 	scale->View();
+	graph->View();
 }
 
 void ResultGraph::Delete() {

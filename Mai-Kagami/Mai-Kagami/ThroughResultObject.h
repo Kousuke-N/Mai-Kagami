@@ -78,6 +78,7 @@ private:
 	Font *font;
 	const float w = WIDTH * 0.6, h = HEIGHT * 0.13;
 	int pointMax = 0, partMax = 0;
+	MyDrawPolygon *graph;
 };
 
 #endif

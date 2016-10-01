@@ -1,6 +1,7 @@
 #ifndef __DRAWOBJECT_H_INCLUDED__
 #define __DRAWOBJECT_H_INCLUDED__
 
+#include <math.h>
 #include "DxLib.h"
 #define _USE_MATH_DEFINES
 #include "Main.h"
@@ -72,6 +73,21 @@ private:
 	float w, h, l; //幅、高さ、線の太さ
 };
 
+//多角形
+class MyDrawPolygon : public Draw, public Color {
+public:
+	MyDrawPolygon(const float x[], const float y[], int vertexNum, char *colorName = "Blue");
+	void ContentView();
+private:
+	void ClassifyArray(const float x[], const float y[], int triangleVertex, int vertexNum, float tri_x[], float tri_y[], float ntri_x[], float ntri_y[]);
+	int FindFarthestVertex(const float x[], const float y[], int vertexNum);
+	bool CheckNoPointInGraph(const float ntri_x[], const float ntri_y[], const float tri_x[], const float tri_y[], int vertexNum);
+	int CheckGraphDirction(const float tri_x[], const float tri_y[]);
+	MyDrawTriangle* triangle[100];	//多角形を埋める三角形
+	int triangleNum = 0;	//三角形の数
+};
+
+//バー
 class MyDrawBar : public MyDrawBox {
 public:
 	MyDrawBar(const float x, const float y, const float width, const float height, const char *colorName = "White"); //四角形初期化（塗りつぶしあり）

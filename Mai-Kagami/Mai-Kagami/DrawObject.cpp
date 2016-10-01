@@ -188,6 +188,115 @@ float MyDrawBox::GetHeight() {
 	return h * SIZE_RATE;
 }
 
+//MyPolygon(頂点のx座標,頂点のy座標,頂点の数,色)
+MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, char* colorName) 
+	:Color(colorName), Draw(){
+	float xx[100] = { 0 }, yy[100] = { 0 };
+	//x[]をコピー
+	for (int i = 0; i < vertexNum; i++) {
+		xx[i] = x[i]; yy[i] = y[i];
+	}
+
+	//三角形の座標､非三角形の座標
+	float tri_x[3], tri_y[3], ntri_x[97], ntri_y[97];
+	int j = 0;
+	//while (vertexNum > 0) {
+		int i = 0;
+		//図形の方向を記録する変数
+		int oldDirection = 0, newDirection = 0;
+		//最も原点から遠い頂点
+		int farthestVertex = FindFarthestVertex(xx, yy, vertexNum);
+		do {
+			//三角形を構成する頂点とそれ以外の頂点を分類
+			ClassifyArray(xx, yy,  farthestVertex++, vertexNum, tri_x, tri_y, ntri_x, ntri_y);
+
+			//三角形の向きを記録しそれを比較
+			oldDirection = newDirection;
+			newDirection = CheckGraphDirction(tri_x, tri_y);
+			if (i > 1 && oldDirection * newDirection < 0) {
+				continue;
+			}
+		} while (!CheckNoPointInGraph(ntri_x, ntri_y, tri_x, tri_y, vertexNum - 3));
+
+		triangle[j] = new MyDrawTriangle(tri_x[0], tri_y[0], tri_x[1], tri_y[1], tri_x[2], tri_y[2]);
+		triangleNum++;	j++;
+		//三角形の頂点を除く配列の作成
+		printfDx("%d", xx);
+		//while (++(xx + farthestVertex) < 0)
+		//	*(ptr - 1) = *ptr;
+	//}
+}
+
+//座標を三角形を構成する点とそうでない点に分類する
+//注意!vertexNumはすべての頂点の数
+//(x座標,y座標,三角形の頂点の要素番号,頂点の数,三角形の頂点のx座標を入れる配列,三角形の頂点のy座標を入れる配列,それ以外のx座標を入れる配列,それ以外のy座標を入れる配列)
+void MyDrawPolygon::ClassifyArray(const float x[], const float y[], int triangleVertex, int vertexNum, float tri_x[], float tri_y[], float ntri_x[], float ntri_y[]) {
+	//三角形を構成する点の要素番号
+	int vertexMakingTriangle[3] = { (triangleVertex - 2 + vertexNum) % vertexNum,
+		(triangleVertex - 1 + vertexNum) % vertexNum,
+		(triangleVertex + vertexNum) % vertexNum };
+	//三角形を構成する点を含まない配列を作成
+	float xx[100] = { 0 }, yy[100] = { 0 };
+	int n = 0;
+	for (int i = 0; i < vertexNum + 3; i++) {
+		if (i == vertexMakingTriangle[0] || i == vertexMakingTriangle[1] || i == vertexMakingTriangle[2]) {
+			tri_x[i - n] = x[i];
+			tri_y[i - n] = y[i];
+			printfDx("%f %f\n", x[i], y[i]);
+			continue;
+		}
+		ntri_x[n] = x[i];	ntri_y[n] = y[i];
+		n++;
+	}
+}
+
+//原点から一番遠い頂点を探す
+//返り値は1番遠い頂点の要素数
+int MyDrawPolygon::FindFarthestVertex(const float x[], const float y[], int vertexNum) {
+	int farthestVertexNum = 0;	//一番遠い頂点の番号
+	float farthestDistanse = 0;	//一番遠い頂点との距離
+	float distanse = 0;			//距離
+	for (int i = 0; i < vertexNum; i++) {
+		distanse = pow(x[i] * x[i] + y[i] * y[i], 0.5);
+		if (distanse> farthestDistanse) {
+			farthestDistanse = distanse;
+			farthestVertexNum = i + 1;
+		}
+	}
+	return farthestVertexNum;
+}
+
+//(x座標,y座標,三角形のを構成する点の真ん中の点の番号,頂点の数)
+//x座標、y座標については三角形を構成する点も含む
+//注意!vertexNumは三角形を構成しない頂点の数
+//三角形の中に点がなければtrueあればfalse
+bool MyDrawPolygon::CheckNoPointInGraph(const float ntri_x[], const float ntri_y[], const float tri_x[], const float tri_y[], int vertexNum) {
+	//三角形の中に点がないか調べる
+	int temp[3] = { 0 };
+	for (int i = 0; i < vertexNum; i++) {
+		temp[0] = (ntri_x[i] - tri_x[0]) * (tri_y[1] - tri_y[0]) - (ntri_y[i] - tri_y[0]) * (tri_x[1] - tri_x[0]);
+		temp[1] = (ntri_x[i] - tri_x[1]) * (tri_y[2] - tri_y[1]) - (ntri_y[i] - tri_y[1]) * (tri_x[2] - tri_x[1]);
+		temp[2] = (ntri_x[i] - tri_x[2]) * (tri_y[0] - tri_y[2]) - (ntri_y[i] - tri_y[2]) * (tri_x[0] - tri_x[2]);
+		if ((temp[0] > 0 && temp[1] > 0 && temp[2] > 0) || (temp[0] < 0 && temp[1] < 0 && temp[2] < 0)){
+			return false;
+		}
+	}
+	return true;
+}
+
+//グラフの向きを1,0,-1のいずれかの値で返します
+int MyDrawPolygon::CheckGraphDirction(const float tri_x[], const float tri_y[]) {
+	float temp = (tri_x[2] - tri_x[0]) * (tri_y[1] - tri_y[0]) - (tri_y[2] - tri_y[0]) * (tri_x[1] - tri_x[0]);
+	return temp == 0 ? temp :
+		    temp < 0 ? -1 : 1;
+}
+
+void MyDrawPolygon::ContentView() {
+	for (int i = 0; i < triangleNum; i++) {
+		triangle[i]->View();
+	}
+}
+
 //進捗バー初期化
 MyDrawBar::MyDrawBar(const float x, const float y, const float width, const float height, const char *colorName)
 	:MyDrawBox(x + width / 2, y, width, height, colorName) {
