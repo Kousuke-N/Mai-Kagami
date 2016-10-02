@@ -84,6 +84,7 @@ private:
 	int FindFarthestVertex(const float x[], const float y[], int vertexNum);
 	bool CheckNoPointInGraph(const float ntri_x[], const float ntri_y[], const float tri_x[], const float tri_y[], int vertexNum);
 	int CheckGraphDirction(const float tri_x[], const float tri_y[]);
+	float DistancePointLine(const float line_x1, const float line_y1, const float line_x2, const float line_y2, const float pointx, const float pointy);
 	MyDrawTriangle* triangle[100];	//‘½ŠpŒ`‚ğ–„‚ß‚éOŠpŒ`
 	MyDrawLine* line[300];
 	int triangleNum = 0;	//OŠpŒ`‚Ì”

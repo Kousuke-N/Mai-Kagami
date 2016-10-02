@@ -138,8 +138,8 @@ ResultGraph::ResultGraph(Font *font)
 	this->vertexNum = 0;
 
 	text = new MyDrawText(font, "区間別採点", WIDTH*0.35, HEIGHT*0.245, 0, 20);
-	frame[0] = new MyDrawLine(GetX() - w / 2, GetY() - h / 2, GetX() - w / 2, GetY() + h / 2, 6, "White");
-	frame[1] = new MyDrawLine(GetX() - w / 2, GetY() + h / 2, GetX() + w / 2, GetY() + h / 2, 6, "White");
+	frame[0] = new MyDrawLine(GetX() - w / 2, GetY() - h / 2, GetX() - w / 2, GetY() + h / 2, 8, "White");
+	frame[1] = new MyDrawLine(GetX() - w / 2, GetY() + h / 2, GetX() + w / 2, GetY() + h / 2, 8, "White");
 	scale = new MyDrawTexts(font, "100\n・\n・\n・\n・\n50\n・\n・\n・\n・\n0", GetX() - w / 2 - WIDTH * 0.025, GetY(), 1, 20, 4);
 	AddVertex(GetX() + w / 2, GetY() + h / 2);
 	AddVertex(GetX() - w / 2, GetY() + h / 2);

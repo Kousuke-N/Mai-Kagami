@@ -201,12 +201,12 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 	float tri_x[3], tri_y[3], ntri_x[97], ntri_y[97];
 	int j = 0;
 
-	while (vertexNum > 0) {
+	while (vertexNum > 2) {
 		int i = 0;
 		//図形の方向を記録する変数
-		int oldDirection = 0, newDirection = 0;
+		float oldDirection = 0, newDirection = 0;
 		//最も原点から遠い頂点
-		int farthestVertex = FindFarthestVertex(xx, yy, vertexNum);
+		float farthestVertex = FindFarthestVertex(xx, yy, vertexNum);
 		do {
 			//三角形を構成する頂点とそれ以外の頂点を分類
 			ClassifyArray(xx, yy,  farthestVertex++, vertexNum, tri_x, tri_y, ntri_x, ntri_y);
@@ -219,14 +219,20 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 		} while (!CheckNoPointInGraph(ntri_x, ntri_y, tri_x, tri_y, vertexNum - 3));
 
 		triangle[j] = new MyDrawTriangle(tri_x[0], tri_y[0], tri_x[1], tri_y[1], tri_x[2], tri_y[2], colorName);
-		line[3 * j + 0] = new MyDrawLine(tri_x[0], tri_y[0], tri_x[1], tri_y[1], 6, "Blue");
-		line[3 * j + 1] = new MyDrawLine(tri_x[1], tri_y[1], tri_x[2], tri_y[2], 6, "Blue");
-		line[3 * j + 2] = new MyDrawLine(tri_x[2], tri_y[2], tri_x[0], tri_y[0], 6, "Blue");
+		for (int k = 0; k < 3; k++) {
+			float dis = DistancePointLine(tri_x[k], tri_y[k], tri_x[(k + 1) % 3], tri_y[(k + 1) % 3], tri_x[(k + 2) % 3], tri_y[(k + 2) % 3]);
+			if ( dis < 6 && dis > -6 ) {
+				triangle[j]->SetViewFlag(false);
+			}
+		}
+		for(int k = 0; k < 3; k++)
+			line[3 * j + k] = new MyDrawLine(tri_x[k], tri_y[k], tri_x[(k + 1) % 3], tri_y[(k + 1) % 3], 6, colorName);
+
 		triangleNum++;	j++;
 		//三角形の頂点を除く配列の作成
 		for (int i = 0; farthestVertex - 2 + i < vertexNum; i++) {
-			*(xx + farthestVertex - 2 + i) = *(xx + farthestVertex - 1 + i);
-			*(yy + farthestVertex - 2 + i) = *(yy + farthestVertex - 1 + i);
+			*(xx + (int)farthestVertex - 2 + i) = *(xx + (int)farthestVertex - 1 + i);
+			*(yy + (int)farthestVertex - 2 + i) = *(yy + (int)farthestVertex - 1 + i);
 		}
 		vertexNum--;
 	}
@@ -237,7 +243,7 @@ MyDrawPolygon::MyDrawPolygon(const float x[], const float y[], int vertexNum, ch
 //(x座標,y座標,三角形の頂点の要素番号,頂点の数,三角形の頂点のx座標を入れる配列,三角形の頂点のy座標を入れる配列,それ以外のx座標を入れる配列,それ以外のy座標を入れる配列)
 void MyDrawPolygon::ClassifyArray(const float x[], const float y[], int triangleVertex, int vertexNum, float tri_x[], float tri_y[], float ntri_x[], float ntri_y[]) {
 	//三角形を構成する点の要素番号
-	int vertexMakingTriangle[3] = { (triangleVertex - 2 + vertexNum) % vertexNum,
+	float vertexMakingTriangle[3] = { (triangleVertex - 2 + vertexNum) % vertexNum,
 		(triangleVertex - 1 + vertexNum) % vertexNum,
 		(triangleVertex + vertexNum) % vertexNum };
 	//三角形を構成する点を含まない配列を作成
@@ -257,7 +263,7 @@ void MyDrawPolygon::ClassifyArray(const float x[], const float y[], int triangle
 //原点から一番遠い頂点を探す
 //返り値は1番遠い頂点の要素数
 int MyDrawPolygon::FindFarthestVertex(const float x[], const float y[], int vertexNum) {
-	int farthestVertexNum = 0;	//一番遠い頂点の番号
+	float farthestVertexNum = 0;	//一番遠い頂点の番号
 	float farthestDistanse = 0;	//一番遠い頂点との距離
 	float distanse = 0;			//距離
 	for (int i = 0; i < vertexNum; i++) {
@@ -276,12 +282,12 @@ int MyDrawPolygon::FindFarthestVertex(const float x[], const float y[], int vert
 //三角形の中に点がなければtrueあればfalse
 bool MyDrawPolygon::CheckNoPointInGraph(const float ntri_x[], const float ntri_y[], const float tri_x[], const float tri_y[], int vertexNum) {
 	//三角形の中に点がないか調べる
-	int temp[3] = { 0 };
+	float temp[3] = { 0 };
 	for (int i = 0; i < vertexNum; i++) {
 		temp[0] = (ntri_x[i] - tri_x[0]) * (tri_y[1] - tri_y[0]) - (ntri_y[i] - tri_y[0]) * (tri_x[1] - tri_x[0]);
 		temp[1] = (ntri_x[i] - tri_x[1]) * (tri_y[2] - tri_y[1]) - (ntri_y[i] - tri_y[1]) * (tri_x[2] - tri_x[1]);
 		temp[2] = (ntri_x[i] - tri_x[2]) * (tri_y[0] - tri_y[2]) - (ntri_y[i] - tri_y[2]) * (tri_x[0] - tri_x[2]);
-		if ((temp[0] > 0 && temp[1] > 0 && temp[2] > 0) || (temp[0] < 0 && temp[1] < 0 && temp[2] < 0)){
+		if (((temp[0] > 0 && temp[1] > 0 && temp[2] > 0) || (temp[0] < 0 && temp[1] < 0 && temp[2] < 0)) || (temp[0] == 0 || temp[1] == 0 || temp[2] == 0)){
 			return false;
 		}
 	}
@@ -293,6 +299,11 @@ int MyDrawPolygon::CheckGraphDirction(const float tri_x[], const float tri_y[]) 
 	float temp = (tri_x[2] - tri_x[0]) * (tri_y[1] - tri_y[0]) - (tri_y[2] - tri_y[0]) * (tri_x[1] - tri_x[0]);
 	return temp == 0 ? temp :
 		    temp < 0 ? -1 : 1;
+}
+
+//点と線の距離を測る
+float MyDrawPolygon::DistancePointLine(const float line_x1, const float line_y1, const float line_x2, const float line_y2, const float point_x, const float point_y) {
+	return ((line_x2 - line_x1)*(point_y - line_y1) - (line_y2 - line_y1) * (point_x - line_x1)) / pow((line_x2 - line_x1) * (line_x2 - line_x1) + (line_y2 - line_y1) * (line_y2 - line_y1), 0.5);
 }
 
 void MyDrawPolygon::ContentView() {
