@@ -15,6 +15,7 @@ bool Http::Send(WCHAR szUrl[]) {
 	HINTERNET		hConnect, hRequest;
 	URL_COMPONENTS	urlComponents;
 	WCHAR			szHostName[256], szUrlPath[2048];
+	WCHAR			szHeader[] = L"Content-Type:text/html; charset=UTF-8";
 	LPBYTE			lpHeader, lpData;
 	DWORD			dwSize;
 
@@ -35,14 +36,6 @@ bool Http::Send(WCHAR szUrl[]) {
 		WinHttpCloseHandle(hSession);
 		return false;
 	}
-	
-	hRequest = WinHttpOpenRequest(hConnect, L"GET", szUrlPath, NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
-	if (hRequest == NULL) {
-		WinHttpCloseHandle(hConnect);
-		WinHttpCloseHandle(hSession);
-		return false;
-	}
-
 
 	if (!WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, WINHTTP_IGNORE_REQUEST_TOTAL_LENGTH, 0)) {
 		WinHttpCloseHandle(hRequest);
